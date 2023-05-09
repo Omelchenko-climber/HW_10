@@ -32,35 +32,35 @@ class Record:
         if phone is not None:
             self.add_phone(phone)
 
-    def add_phone(self, phone: Phone | str):
+    def add_phone(self, phone: Phone | str) -> None:
         if isinstance(phone, str):
             phone = self.create_phone(phone)
         self.phones.append(phone)
 
-    def create_phone(self, phone: str):
+    def create_phone(self, phone: str) -> Phone:
         return Phone(phone)
 
-    def swap_number(self, old_phone, new_phone):
+    def swap_number(self, old_phone, new_phone) -> str:
         for number in self.phones:
             if number.value == old_phone:
                 number.value = new_phone
                 return number
 
-    def delete_number(self, phone: str):
+    def delete_number(self, phone: str) -> str:
         for number in self.phones:
             if number.value == phone:
                 self.phones.remove(number)
                 return number
 
 
-    def show(self):
+    def show(self) -> None:
         for inx, p in enumerate(self.phones, 1):
             print(f'{inx}: {p.value}')
 
-    def get_phone(self, inx):
+    def get_phone(self, inx) -> list:
         return self.phones[inx - 1]
 
-    def get_name(self):
+    def get_name(self) -> str:
         return self.name.value
 
     def __str__(self) -> str:
@@ -74,15 +74,15 @@ class AddressBook(UserDict):
     def __init__(self, record: Record | None = None) -> None:
         self.data = {}
         if record is not None:
-            self.add_record(record)
+            self.add_contact(record)
 
-    def add_contact(self, record: Record):
+    def add_contact(self, record: Record) -> None:
         self.data[record.get_name()] = record
 
-    def show_contacts(self):
+    def show_contacts(self) -> None:
         for name, record in self.data.items():
             print(f'{name}:')
             record.show()
 
-    def get_phones(self, name: str):
+    def get_phones(self, name: str) -> None:
         return self.data[name]

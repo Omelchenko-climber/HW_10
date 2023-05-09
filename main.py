@@ -102,7 +102,7 @@ def unknown_command(command: str) -> str:
 
 
 @input_error
-def main():
+def main() -> None:
     while True:
         user_input = input('Waiting for command (if you want to see all available commands enter "help"): ')
         if not user_input:
