@@ -22,25 +22,21 @@ def input_error(func):
     return inner
 
 
-def hello() -> None:
-    return 'How can I help you?'
-
-
 @input_error
-def add_contact(user_name: str, user_phone: str) -> str:
+def add_contact(user_name: str, user_phones: str) -> str:
     name = Name(user_name)
-    phone = Phone(user_phone)
+    phone = Phone(user_phones)
     record = Record(name, phone)
     USERS.add_contact(record)
-    return f'Contact {user_name} with phone number {user_phone} has been added.'
+    return f'Contact {user_name} with phone number {user_phones} has been added.'
 
 
 @input_error
-def add_phone(user_name: str, user_phone: str) -> str:
+def add_phone(user_name: str, user_phones: str) -> str:
     record = USERS.get_phones(user_name)
-    phone = Phone(user_phone)
+    phone = Phone(user_phones)
     record.add_phone(phone)
-    return f'Phone number {user_phone} has just been added to contact {user_name}'
+    return f'Phone number {user_phones} has just been added to contact {user_name}'
 
 
 @input_error
@@ -52,10 +48,13 @@ def change_phone(user_name: str, user_phones: str) -> str:
 
 
 @input_error
-def delete_phone(user_name: str, user_phone: str) -> str:
+def delete_phone(user_name: str, user_phones: str) -> str:
     record = USERS.get_phones(user_name)
-    record.delete_number(user_phone)
-    return f'Phone number {user_phone} has just been deleted from contact {user_name}.'
+    record.delete_number(user_phones)
+    return f'Phone number {user_phones} has just been deleted from contact {user_name}.'
+
+def add_birthday(date: str) -> str:
+    pass
 
 
 @input_error
@@ -75,65 +74,65 @@ def close() -> None:
 
 
 @input_error
-def show_commands() -> str:
-    result = ''
-    for key in COMMANDS.keys():
-        result += key + '\n'
-    return result
+def show_commands() -> None:
+    print("""Сommand list (enter the number corresponding to the command you need):
+    0 : to show commands,
+    1 : to add new contact  (input format: Name phone),
+    2 : to add new phone  (input format: Name new_phone),
+    3 : to delete the phone  (input format: Name phone_to_delete),
+    4 : to change phone  (input format: Name old_phone new_phone),    
+    5 : to add birthday  (input format: Name day/month/year),
+    6 : to show contact  (input format: Name),
+    7 : to show all contacts,
+    8 : to close the app""")
 
 
 COMMANDS = {
-    'help': show_commands,
-    'hello': hello,
-    'add contact': add_contact,
-    'add phone': add_phone,
-    'change phone': change_phone,
-    'delete phone': delete_phone,
-    'show contact': show_contact,
-    'show all': show_all,
-    'good bye': close,
-    'close': close,
-    'exit': close
+    '0': show_commands,
+    '1': add_contact,
+    '2': add_phone,
+    '3': delete_phone,
+    '4': change_phone,
+    '5': add_birthday,
+    '6': show_contact,
+    '7': show_all,
+    '8': close,
 }
 
 
-def unknown_command(command: str) -> str:
-    return f'Unknown command: "{command}", check your input.'
-
+def get_user_input(user_command: str) -> str:
+    user_input = ''
+    if int(user_command) in range(1, 4):
+        user_input = input('Enter the name and the phone, please: ')
+    elif user_command == '4':
+        user_input = input('Enter the name and the phones, please: ')
+    elif user_command == '5':
+        user_input = input('Enter the name and birthday: ')
+    elif user_command == '6':
+        user_input = input('Enter the name: ')
+    return user_input
 
 @input_error
 def main() -> None:
     while True:
-        user_input = input('Waiting for command (if you want to see all available commands enter "help"): ')
-        if not user_input:
-            print('Give me the command, please!')
-            continue
-        if user_input.lower() in COMMANDS:
-            handler = COMMANDS[user_input.lower()]()
-            if not handler:
-                break
+        user_command = input('Waiting for command: ')
+        if not user_command: show_commands(); continue
+        if user_command in COMMANDS:
+            if user_command in ['0', '7']:
+                COMMANDS[user_command](); continue
+            if user_command == '8':
+                COMMANDS['8'](); break
+            user_input = get_user_input(user_command)
+            input_name, *input_phone = re.split(r'(?=\s[\+0-9])', user_input)
+            if input_phone:
+                phones = ' '.join([number.strip() for number in input_phone])
+                print(COMMANDS[user_command](input_name, phones))
             else:
-                print(handler)
-                continue
-        if re.search(r'[A-Z]', user_input):
-            command, *args = re.split(r'(?=\s[A-Z])', user_input)
-            args = args[0].strip().split()
-            if COMMANDS.get(command.lower()):
-                action = COMMANDS.get(command.lower())
-                if len(args) > 1:
-                    name, *phone = args
-                    phone = ' '.join(str(x) for x in phone)
-                    handler = action(name, phone)
-                    print(handler)
-                else:
-                    handler = action(args[0].strip())
-                    print(handler)
-            else:
-                print(unknown_command(command))
+                print(COMMANDS[user_command](input_name))
         else:
-            print('Enter your name with a capital letter, please.')
-            continue
+            print('You has just entered wrong number, try again please.')
 
 
 if __name__ == '__main__':
+    show_commands()
     main()

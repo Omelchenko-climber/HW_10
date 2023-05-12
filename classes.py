@@ -80,9 +80,11 @@ class AddressBook(UserDict):
         self.data[record.get_name()] = record
 
     def show_contacts(self) -> None:
-        for name, record in self.data.items():
-            print(f'{name}:')
-            record.show()
+        if self.data:
+            for name, record in self.data.items():
+                print(f'{name}:')
+                record.show()
+        else: print("You haven't any contacts yet.")
 
     def get_phones(self, name: str) -> None:
         return self.data[name]
